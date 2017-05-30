@@ -28,13 +28,14 @@ import com.example.shaimaalzahrani.inventoryapp_ufp.data.*;
 
 public class DetailsActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = DetailsActivity.class.getCanonicalName();
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     private InventoryDbHelper dbHelper;
     EditText nameEdit;
     EditText priceEdit;
     EditText quantityEdit;
     EditText supplierNameEdit;
+    EditText supplierPhoneEdit;
+    EditText supplierEmailEdit;
     long currentItemId;
     ImageButton decreaseQuantity;
     ImageButton increaseQuantity;
@@ -56,6 +57,8 @@ public class DetailsActivity extends AppCompatActivity {
         priceEdit = (EditText) findViewById(R.id.price_edit);
         quantityEdit = (EditText) findViewById(R.id.quantity_edit);
         supplierNameEdit = (EditText) findViewById(R.id.supplier_name_edit);
+        supplierPhoneEdit = (EditText) findViewById(R.id.supplier_phone_edit);
+        supplierEmailEdit = (EditText) findViewById(R.id.supplier_email_edit);
         decreaseQuantity = (ImageButton) findViewById(R.id.decrease_quantity);
         increaseQuantity = (ImageButton) findViewById(R.id.increase_quantity);
         imageBtn = (Button) findViewById(R.id.select_image);
@@ -106,11 +109,9 @@ public class DetailsActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // User clicked "Discard" button, close the current activity.
                         finish();
                     }
                 };
-        // Show dialog that there are unsaved changes
         showUnsavedChangesDialog(discardButtonClickListener);
     }
 
@@ -178,9 +179,7 @@ public class DetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                // save item in DB
                 if (!addItemToDb()) {
-                    // saying to onOptionsItemSelected that user clicked button
                     return true;
                 }
                 finish();
@@ -194,12 +193,14 @@ public class DetailsActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                // User clicked "Discard" button, navigate to parent activity.
                                 NavUtils.navigateUpFromSameTask(DetailsActivity.this);
                             }
                         };
-                // Show a dialog that notifies the user they have unsaved changes
                 showUnsavedChangesDialog(discardButtonClickListener);
+                return true;
+            case R.id.action_order:
+                // dialog with phone and email
+                showOrderConfirmationDialog();
                 return true;
             case R.id.action_delete_item:
                 // delete one item
@@ -227,6 +228,12 @@ public class DetailsActivity extends AppCompatActivity {
         if (!checkIfValueSet(supplierNameEdit, "supplier name")) {
             isAllOk = false;
         }
+        if (!checkIfValueSet(supplierPhoneEdit, "supplier phone")) {
+            isAllOk = false;
+        }
+        if (!checkIfValueSet(supplierEmailEdit, "supplier email")) {
+            isAllOk = false;
+        }
         if (actualUri == null && currentItemId == 0) {
             isAllOk = false;
             imageBtn.setError("Missing image");
@@ -241,6 +248,8 @@ public class DetailsActivity extends AppCompatActivity {
                     priceEdit.getText().toString().trim(),
                     Integer.parseInt(quantityEdit.getText().toString().trim()),
                     supplierNameEdit.getText().toString().trim(),
+                    supplierPhoneEdit.getText().toString().trim(),
+                    supplierEmailEdit.getText().toString().trim(),
                     actualUri.toString());
             dbHelper.insertItem(item);
         } else {
@@ -267,11 +276,44 @@ public class DetailsActivity extends AppCompatActivity {
         priceEdit.setText(cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_PRICE)));
         quantityEdit.setText(cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_QUANTITY)));
         supplierNameEdit.setText(cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_SUPPLIER_NAME)));
+        supplierPhoneEdit.setText(cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_SUPPLIER_PHONE)));
+        supplierEmailEdit.setText(cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_SUPPLIER_EMAIL)));
         imageView.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_IMAGE))));
         nameEdit.setEnabled(false);
         priceEdit.setEnabled(false);
         supplierNameEdit.setEnabled(false);
+        supplierPhoneEdit.setEnabled(false);
+        supplierEmailEdit.setEnabled(false);
         imageBtn.setEnabled(false);
+    }
+
+    private void showOrderConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.order_message);
+        builder.setPositiveButton(R.string.phone, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // phone
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + supplierPhoneEdit.getText().toString().trim()));
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton(R.string.email, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // email
+                Intent intent = new Intent(android.content.Intent.ACTION_SENDTO);
+                intent.setType("text/plain");
+                intent.setData(Uri.parse("mailto:" + supplierEmailEdit.getText().toString().trim()));
+                intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Recurrent new order");
+                String bodyMessage = "Please send us as soon as possible more " +
+                        nameEdit.getText().toString().trim() +
+                        "!!!";
+                intent.putExtra(android.content.Intent.EXTRA_TEXT, bodyMessage);
+                startActivity(intent);
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private int deleteAllRowsFromTable() {
@@ -316,9 +358,9 @@ public class DetailsActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             return;
         }
         openImageSelector();
@@ -341,11 +383,9 @@ public class DetailsActivity extends AppCompatActivity {
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openImageSelector();
-                    // permission was granted
                 }
             }
         }
@@ -353,15 +393,8 @@ public class DetailsActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        // The ACTION_OPEN_DOCUMENT intent was sent with the request code READ_REQUEST_CODE.
-        // If the request code seen here doesn't match, it's the response to some other intent,
-        // and the below code shouldn't run at all.
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            // The document selected by the user won't be returned in the intent.
-            // Instead, a URI to that document will be contained in the return intent
-            // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
-
             if (resultData != null) {
                 actualUri = resultData.getData();
                 imageView.setImageURI(actualUri);

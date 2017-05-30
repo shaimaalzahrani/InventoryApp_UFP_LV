@@ -6,13 +6,17 @@ public class StockItem {
     private final String price;
     private final int quantity;
     private final String supplierName;
+    private final String supplierPhone;
+    private final String supplierEmail;
     private final String image;
 
-    public StockItem(String productName, String price, int quantity, String supplierName, String image) {
+    public StockItem(String productName, String price, int quantity, String supplierName, String supplierPhone, String supplierEmail, String image) {
         this.productName = productName;
         this.price = price;
         this.quantity = quantity;
         this.supplierName = supplierName;
+        this.supplierPhone = supplierPhone;
+        this.supplierEmail = supplierEmail;
         this.image = image;
     }
 
@@ -32,6 +36,14 @@ public class StockItem {
         return supplierName;
     }
 
+    public String getSupplierPhone() {
+        return supplierPhone;
+    }
+
+    public String getSupplierEmail() {
+        return supplierEmail;
+    }
+
     public String getImage() {
         return image;
     }
@@ -42,6 +54,8 @@ public class StockItem {
                 ", price='" + price + '\'' +
                 ", quantity=" + quantity +
                 ", supplierName='" + supplierName + '\'' +
+                ", supplierPhone='" + supplierPhone + '\'' +
+                ", supplierEmail='" + supplierEmail + '\'' +
                 '}';
     }
 

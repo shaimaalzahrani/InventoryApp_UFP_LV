@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
@@ -14,7 +16,7 @@ import com.example.shaimaalzahrani.inventoryapp_ufp.data.StockItem;
 
 
 public class MainActivity extends AppCompatActivity {
-    private final static String LOG_TAG = MainActivity.class.getCanonicalName();
+
     InventoryDbHelper dbHelper;
     StockCursorAdapter adapter;
     int lastVisibleItem = 0;
@@ -23,10 +25,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //addDummyData();
         dbHelper = new InventoryDbHelper(this);
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+                startActivity(intent);
+            }
+        });
+
         final ListView listView = (ListView) findViewById(R.id.list_view);
         View emptyView = findViewById(R.id.empty_view);
         listView.setEmptyView(emptyView);
@@ -72,46 +81,66 @@ public class MainActivity extends AppCompatActivity {
         adapter.swapCursor(dbHelper.readStock());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add_dummy_data:
+                // add dummy data for testing
+                addDummyData();
+                adapter.swapCursor(dbHelper.readStock());
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * Add data for demo purposes
      */
     private void addDummyData() {
         StockItem gummibears = new StockItem(
-                "Gummibears",
+                "Gummybears",
                 "10 SAR",
-                45,
+                66,
                 "Shaima Alzahrani",
-                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/gummybear.png");
+                "+966 00 000 0000",
+                "shaima@inv.com",
+                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/gummybear");
         dbHelper.insertItem(gummibears);
 
         StockItem cola = new StockItem(
                 "Cola",
-                "6 SAR",
-                44,
+                "13 SAR",
+                78,
                 "Shaima Alzahrani",
+                "+966 00 000 0000",
+                "shaima@inv.com",
                 "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/cola");
         dbHelper.insertItem(cola);
 
         StockItem fruitSalad = new StockItem(
                 "Fruit salad",
                 "20 SAR",
-                34,
+                32,
                 "Shaima Alzahrani",
+                "+966 00 000 0000",
+                "shaima@inv.com",
                 "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/fruit_salad");
         dbHelper.insertItem(fruitSalad);
 
-        StockItem lolipopStrawberry = new StockItem(
+        StockItem lolipop = new StockItem(
                 "Lolipop strawberry",
                 "12 SAR",
-                62,
+                22,
                 "Shaima Alzahrani",
+                "+966 00 000 0000",
+                "shaima@inv.com",
                 "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/lolipop");
-        dbHelper.insertItem(lolipopStrawberry);
+        dbHelper.insertItem(lolipop);
 
-    }
-
-    public void OpenD(View view) {
-        Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-        startActivity(intent);
     }
 }
