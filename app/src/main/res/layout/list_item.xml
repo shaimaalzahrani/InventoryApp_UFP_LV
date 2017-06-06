@@ -63,7 +63,7 @@
                 android:gravity="end|center_vertical"
                 android:text=""
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="36sp"
+                android:textSize="34sp"
                 tools:text="3" />
 
         </LinearLayout>

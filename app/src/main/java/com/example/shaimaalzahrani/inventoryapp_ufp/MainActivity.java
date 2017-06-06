@@ -11,50 +11,50 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
-import com.example.shaimaalzahrani.inventoryapp_ufp.data.InventoryDbHelper;
-import com.example.shaimaalzahrani.inventoryapp_ufp.data.StockItem;
-
 
 public class MainActivity extends AppCompatActivity {
 
-    InventoryDbHelper dbHelper;
-    StockCursorAdapter adapter;
-    int lastVisibleItem = 0;
+    InventoryAppDbHelper dbHelper;
+    InventoryAppCursorAdapter adapter;
+    int lastItem = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        dbHelper = new InventoryDbHelper(this);
+        dbHelper = new InventoryAppDbHelper(this);
 
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // Adding button
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.ADDING);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+                Intent intent = new Intent(MainActivity.this, ItemDetailsActivity.class);
                 startActivity(intent);
             }
         });
 
+        // list view
         final ListView listView = (ListView) findViewById(R.id.list_view);
-        View emptyView = findViewById(R.id.empty_view);
+        View emptyView = findViewById(R.id.emp_view);
         listView.setEmptyView(emptyView);
 
-        Cursor cursor = dbHelper.readStock();
+        // fill the list
+        Cursor cursor = dbHelper.readAll();
 
-        adapter = new StockCursorAdapter(this, cursor);
+        adapter = new InventoryAppCursorAdapter(this, cursor);
         listView.setAdapter(adapter);
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if(scrollState == 0) return;
                 final int currentFirstVisibleItem = view.getFirstVisiblePosition();
-                if (currentFirstVisibleItem > lastVisibleItem) {
+                if (currentFirstVisibleItem > lastItem) {
                     fab.show();
-                } else if (currentFirstVisibleItem < lastVisibleItem) {
+                } else if (currentFirstVisibleItem < lastItem) {
                     fab.hide();
                 }
-                lastVisibleItem = currentFirstVisibleItem;
+                lastItem = currentFirstVisibleItem;
             }
 
             @Override
@@ -64,21 +64,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // to update if any addition happens
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.swapCursor(dbHelper.readStock());
+        adapter.swapCursor(dbHelper.readAll());
     }
 
+    // open detail activity and send the item id
     public void clickOnViewItem(long id) {
-        Intent intent = new Intent(this, DetailsActivity.class);
+        Intent intent = new Intent(this, ItemDetailsActivity.class);
         intent.putExtra("itemId", id);
         startActivity(intent);
     }
 
+    // this will sell one item (decrement the quantity by 1)
     public void clickOnSale(long id, int quantity) {
         dbHelper.sellOneItem(id, quantity);
-        adapter.swapCursor(dbHelper.readStock());
+        adapter.swapCursor(dbHelper.readAll());
     }
 
     @Override
@@ -91,56 +94,28 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_dummy_data:
-                // add dummy data for testing
                 addDummyData();
-                adapter.swapCursor(dbHelper.readStock());
+                adapter.swapCursor(dbHelper.readAll());
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Add data for demo purposes
-     */
+    // dummy data
     private void addDummyData() {
-        StockItem gummibears = new StockItem(
-                "Gummybears",
-                "10 SAR",
-                66,
-                "Shaima Alzahrani",
-                "+966 00 000 0000",
-                "shaima@inv.com",
-                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/gummybear");
-        dbHelper.insertItem(gummibears);
+        Item thefault = new Item("The Fault In Our Stars", "19 SAR", 50, "Shaima Alzahrani", "+966 00 000 0000",
+                "shaima@inv.com", "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/thefault");
+        dbHelper.insertItem(thefault);
 
-        StockItem cola = new StockItem(
-                "Cola",
-                "13 SAR",
-                78,
-                "Shaima Alzahrani",
-                "+966 00 000 0000",
-                "shaima@inv.com",
-                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/cola");
-        dbHelper.insertItem(cola);
+        Item papertawn = new Item("Paper Towns", "17 SAR", 43, "Shaima Alzahrani", "+966 00 000 0000", "shaima@inv.com",
+                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/papertawn");
+        dbHelper.insertItem(papertawn);
 
-        StockItem fruitSalad = new StockItem(
-                "Fruit salad",
-                "20 SAR",
-                32,
-                "Shaima Alzahrani",
-                "+966 00 000 0000",
-                "shaima@inv.com",
-                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/fruit_salad");
-        dbHelper.insertItem(fruitSalad);
+        Item harrybook = new Item("Harry Poter", "20 SAR", 32, "Shaima Alzahrani", "+966 00 000 0000", "shaima@inv.com",
+                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/harrypoter");
+        dbHelper.insertItem(harrybook);
 
-        StockItem lolipop = new StockItem(
-                "Lolipop strawberry",
-                "12 SAR",
-                22,
-                "Shaima Alzahrani",
-                "+966 00 000 0000",
-                "shaima@inv.com",
-                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/lolipop");
-        dbHelper.insertItem(lolipop);
-
+        Item thift = new Item("The Book Thift", "12 SAR", 22, "Shaima Alzahrani", "+966 00 000 0000", "shaima@inv.com",
+                "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/bookthift");
+        dbHelper.insertItem(thift);
     }
 }

@@ -10,14 +10,12 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.shaimaalzahrani.inventoryapp_ufp.data.*;
-
-public class StockCursorAdapter extends CursorAdapter {
+public class InventoryAppCursorAdapter extends CursorAdapter {
 
 
     private final MainActivity activity;
 
-    public StockCursorAdapter(MainActivity context, Cursor c) {
+    public InventoryAppCursorAdapter(MainActivity context, Cursor c) {
         super(context, c, 0);
         this.activity = context;
     }
@@ -29,27 +27,27 @@ public class StockCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, final Context context, final Cursor cursor) {
-        TextView nameTextView = (TextView) view.findViewById(R.id.product_name);
-        TextView quantityTextView = (TextView) view.findViewById(R.id.quantity);
-        TextView priceTextView = (TextView) view.findViewById(R.id.price);
+        TextView nameTV = (TextView) view.findViewById(R.id.product_name);
+        TextView quantityTV = (TextView) view.findViewById(R.id.quantity);
+        TextView priceTV = (TextView) view.findViewById(R.id.price);
         ImageView sale = (ImageView) view.findViewById(R.id.sale);
         ImageView image = (ImageView) view.findViewById(R.id.image_view);
 
-        String name = cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_NAME));
-        final int quantity = cursor.getInt(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_QUANTITY));
-        String price = cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_PRICE));
+        String name = cursor.getString(cursor.getColumnIndex(InventoryAppContract.StockEntry.COLUMN_NAME));
+        final int quantity = cursor.getInt(cursor.getColumnIndex(InventoryAppContract.StockEntry.COLUMN_QUANTITY));
+        String price = cursor.getString(cursor.getColumnIndex(InventoryAppContract.StockEntry.COLUMN_PRICE));
+        image.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(InventoryAppContract.StockEntry.COLUMN_IMAGE))));
 
-        image.setImageURI(Uri.parse(cursor.getString(cursor.getColumnIndex(StockContract.StockEntry.COLUMN_IMAGE))));
+        nameTV.setText(name);
+        quantityTV.setText(String.valueOf(quantity));
+        priceTV.setText(price);
 
-        nameTextView.setText(name);
-        quantityTextView.setText(String.valueOf(quantity));
-        priceTextView.setText(price);
-
-        final long id = cursor.getLong(cursor.getColumnIndex(StockContract.StockEntry._ID));
+        final long id = cursor.getLong(cursor.getColumnIndex(InventoryAppContract.StockEntry._ID));
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 activity.clickOnViewItem(id);
             }
         });
@@ -57,8 +55,8 @@ public class StockCursorAdapter extends CursorAdapter {
         sale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.clickOnSale(id,
-                        quantity);
+
+                activity.clickOnSale(id, quantity);
             }
         });
     }

@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailsActivity"
+            android:name=".ItemDetailsActivity"
             android:label="@string/new_product">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
