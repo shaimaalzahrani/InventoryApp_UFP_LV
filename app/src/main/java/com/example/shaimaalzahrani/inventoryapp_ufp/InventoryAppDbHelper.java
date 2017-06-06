@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class InventoryAppDbHelper extends SQLiteOpenHelper {
 
-    public final static String DB_NAME = "inv.db";
+    public final static String DB_NAME = "inv_.db";
     public final static int DB_VERSION = 1;
 
     public InventoryAppDbHelper(Context context) {

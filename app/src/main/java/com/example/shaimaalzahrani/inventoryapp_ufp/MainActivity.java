@@ -102,19 +102,15 @@ public class MainActivity extends AppCompatActivity {
 
     // dummy data
     private void addDummyData() {
-        Item thefault = new Item("The Fault In Our Stars", "19 SAR", 50, "Shaima Alzahrani", "+966 00 000 0000",
-                "shaima@inv.com", "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/thefault");
-        dbHelper.insertItem(thefault);
-
-        Item papertawn = new Item("Paper Towns", "17 SAR", 43, "Shaima Alzahrani", "+966 00 000 0000", "shaima@inv.com",
+        Item papertawn = new Item("Paper Towns", "17 SAR", 43, "Shaima Alzahrani", "shaima@inv.com", "+966 00 000 0000",
                 "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/papertawn");
         dbHelper.insertItem(papertawn);
 
-        Item harrybook = new Item("Harry Poter", "20 SAR", 32, "Shaima Alzahrani", "+966 00 000 0000", "shaima@inv.com",
+        Item harrybook = new Item("Harry Poter", "20 SAR", 32, "Shaima Alzahrani", "shaima@inv.com", "+966 00 000 0000",
                 "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/harrypoter");
         dbHelper.insertItem(harrybook);
 
-        Item thift = new Item("The Book Thift", "12 SAR", 22, "Shaima Alzahrani", "+966 00 000 0000", "shaima@inv.com",
+        Item thift = new Item("The Book Thift", "12 SAR", 22, "Shaima Alzahrani", "shaima@inv.com", "+966 00 000 0000",
                 "android.resource://com.example.shaimaalzahrani.inventoryapp_ufp/drawable/bookthift");
         dbHelper.insertItem(thift);
     }
